@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Report {
+  id           String   @id @default(cuid())
+  title        String
+  reportType   String
+  inputType    String
+  originalText String?
+  sourceName   String?
+  language     String   @default("English")
+  analysis     String
+  createdAt    DateTime @default(now())
+}
