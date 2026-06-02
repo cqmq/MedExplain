@@ -10,14 +10,16 @@ export function DisclaimerBanner({ className, compact = false }: DisclaimerBanne
   return (
     <div
       className={cn(
-        "rounded-2xl border border-[var(--color-accent-blue-soft)] bg-[var(--color-accent-blue-soft)] p-4 text-sm leading-relaxed text-foreground",
+        "rounded-2xl border border-[var(--color-info-notice-border)] bg-[var(--color-info-notice-bg)] p-4 text-sm leading-relaxed text-[var(--color-info-notice-text)] shadow-sm",
         compact && "rounded-xl p-3 text-xs",
         className,
       )}
     >
       <div className="flex items-start gap-3">
-        <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[var(--color-accent-blue)]" />
-        <p>
+        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl bg-[var(--color-info-notice-icon-bg)] text-[var(--color-accent-blue)]">
+          <ShieldCheck className="size-4.5" />
+        </span>
+        <p className="pt-0.5">
           MedExplain AI explains reports in simple language. It is not a diagnosis
           and does not replace a doctor. Always discuss your report with a licensed
           healthcare professional.
