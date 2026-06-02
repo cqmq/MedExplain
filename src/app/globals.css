@@ -28,6 +28,10 @@
   --color-accent-teal-soft: #ccfbf1;
   --color-accent-blue: #0369a1;
   --color-accent-blue-soft: #e0f2fe;
+  --color-info-notice-bg: #f2f9fc;
+  --color-info-notice-border: #b8ddea;
+  --color-info-notice-icon-bg: #dff3fb;
+  --color-info-notice-text: #31515e;
   --color-accent-green: #047857;
   --color-accent-amber: #b45309;
   --color-accent-red: #be123c;
@@ -111,6 +115,10 @@
     --color-action-secondary-bg: #1b2424;
     --color-action-secondary-bg-hover: #263333;
     --color-action-secondary-text: #f5f7f7;
+    --color-info-notice-bg: #132427;
+    --color-info-notice-border: #275461;
+    --color-info-notice-icon-bg: #173642;
+    --color-info-notice-text: #c3d5da;
 
     --color-status-normal-bg: #0f2f23;
     --color-status-normal-text: #86efac;
