@@ -9,15 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { DisclaimerBanner } from "@/components/disclaimer-banner";
 import { InputMode, InputTabs } from "@/components/input-tabs";
-import { LanguageSelect } from "@/components/language-select";
+import { useLocale } from "@/components/locale-provider";
 import { ReportTypeSelect } from "@/components/report-type-select";
-import { getDirection } from "@/lib/utils";
-
-const LOADING_MESSAGES = [
-  "Reading your report...",
-  "Simplifying medical terms...",
-  "Preparing your summary...",
-];
+import { getOutputLanguage } from "@/lib/i18n";
 
 const PDF_LIMIT = 25 * 1024 * 1024;
 const IMAGE_LIMIT = 5 * 1024 * 1024;
@@ -28,25 +22,29 @@ interface AnalyzeFormProps {
 
 export function AnalyzeForm({ demoText }: AnalyzeFormProps) {
   const router = useRouter();
+  const { locale, direction, t } = useLocale();
   const [mode, setMode] = useState<InputMode>(demoText ? "text" : "text");
   const [text, setText] = useState(demoText ?? "");
   const [file, setFile] = useState<File | null>(null);
   const [reportType, setReportType] = useState(demoText ? "blood_test" : "unsure");
-  const [language, setLanguage] = useState("English");
   const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [messageIndex, setMessageIndex] = useState(0);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const loadingMessages = useMemo(
+    () => [t("analyze.loading.0"), t("analyze.loading.1"), t("analyze.loading.2")],
+    [t],
+  );
 
   useEffect(() => {
     if (!loading) return;
 
     const interval = window.setInterval(() => {
-      setMessageIndex((index) => (index + 1) % LOADING_MESSAGES.length);
+      setMessageIndex((index) => (index + 1) % loadingMessages.length);
     }, 1800);
 
     return () => window.clearInterval(interval);
-  }, [loading]);
+  }, [loading, loadingMessages.length]);
 
   useEffect(() => {
     return () => {
@@ -82,22 +80,22 @@ export function AnalyzeForm({ demoText }: AnalyzeFormProps) {
   function handleFilePick(selected: File) {
     if (mode === "pdf") {
       if (selected.type !== "application/pdf") {
-        toast.error("Upload a PDF file for this tab.");
+        toast.error(t("analyze.toast.pdfType"));
         return;
       }
       if (selected.size > PDF_LIMIT) {
-        toast.error("PDF is too large (max 25 MB).");
+        toast.error(t("analyze.toast.pdfLarge"));
         return;
       }
     }
 
     if (mode === "image") {
       if (!["image/jpeg", "image/png", "image/webp"].includes(selected.type)) {
-        toast.error("Upload a JPG, PNG, or WebP image.");
+        toast.error(t("analyze.toast.imageType"));
         return;
       }
       if (selected.size > IMAGE_LIMIT) {
-        toast.error("Image is too large (max 5 MB).");
+        toast.error(t("analyze.toast.imageLarge"));
         return;
       }
     }
@@ -122,7 +120,7 @@ export function AnalyzeForm({ demoText }: AnalyzeFormProps) {
 
     const formData = new FormData();
     formData.set("reportType", reportType);
-    formData.set("language", language);
+    formData.set("language", getOutputLanguage(locale));
     formData.set("consent", consent ? "true" : "false");
 
     if (mode === "text") {
@@ -143,18 +141,18 @@ export function AnalyzeForm({ demoText }: AnalyzeFormProps) {
       };
 
       if (!response.ok || !data.success || !data.id) {
-        throw new Error(data.error || "We could not analyze this report.");
+        throw new Error(t("analyze.toast.generic"));
       }
 
       router.push(`/reports/${data.id}`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      toast.error(err instanceof Error ? err.message : t("analyze.toast.generic"));
       setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" dir={getDirection(language)}>
+    <form onSubmit={handleSubmit} className="space-y-6" dir={direction}>
       <InputTabs
         mode={mode}
         text={text}
@@ -169,14 +167,10 @@ export function AnalyzeForm({ demoText }: AnalyzeFormProps) {
         }}
       />
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4">
         <div className="space-y-2">
-          <Label htmlFor="report-type">Report type</Label>
+          <Label htmlFor="report-type">{t("analyze.reportType")}</Label>
           <ReportTypeSelect value={reportType} onValueChange={setReportType} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="language">Output language</Label>
-          <LanguageSelect value={language} onValueChange={setLanguage} />
         </div>
       </div>
 
@@ -186,27 +180,26 @@ export function AnalyzeForm({ demoText }: AnalyzeFormProps) {
           <Checkbox
             checked={consent}
             onCheckedChange={(checked) => setConsent(checked === true)}
-            aria-label="Confirm medical disclaimer"
+            aria-label={t("analyze.consent")}
           />
           <span className="text-sm leading-relaxed text-muted-foreground">
-            I understand this tool does not diagnose medical conditions or replace a
-            doctor. It only explains my report in simple language.
+            {t("analyze.consent")}
           </span>
         </label>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground" aria-live="polite">
-          {loading ? LOADING_MESSAGES[messageIndex] : "Your report is stored locally after analysis."}
+          {loading ? loadingMessages[messageIndex] : t("analyze.stored")}
         </p>
         <Button type="submit" size="lg" disabled={!canAnalyze} className="sm:min-w-44">
           {loading ? (
             <>
               <Loader2 className="size-4 animate-spin" />
-              Analyzing
+              {t("analyze.loading.action")}
             </>
           ) : (
-            "Analyze report"
+            t("analyze.submit")
           )}
         </Button>
       </div>

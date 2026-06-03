@@ -1,6 +1,17 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { AnalysisResult, InputType, ValueStatus } from "@/lib/types";
+import {
+  DEFAULT_LOCALE,
+  getBaselineSafetyNotes,
+  getInputTypeLabel as getLocalizedInputTypeLabel,
+  getLocaleDirection,
+  getReportTypeLabel as getLocalizedReportTypeLabel,
+  getUrgentWarning,
+  localeFromLanguage,
+  t,
+  type Locale,
+} from "@/lib/i18n";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -18,34 +29,25 @@ export const REPORT_TYPES = [
 
 export const LANGUAGES = ["English", "Turkish", "Arabic"] as const;
 
-export const BASELINE_SAFETY_NOTES = [
-  "This explanation is for understanding only and is not a diagnosis.",
-  "Please discuss these results with a licensed healthcare professional.",
-];
+export const BASELINE_SAFETY_NOTES = getBaselineSafetyNotes(DEFAULT_LOCALE);
 
-export const GENERIC_URGENT_WARNING =
-  "This summary cannot detect emergencies. If you experience chest pain, severe shortness of breath, fainting, confusion, severe bleeding, or severe pain, seek urgent medical care.";
+export const GENERIC_URGENT_WARNING = getUrgentWarning(DEFAULT_LOCALE);
 
-export function getReportTypeLabel(value: string) {
-  return REPORT_TYPES.find((type) => type.value === value)?.label ?? "Medical report";
+export function getReportTypeLabel(value: string, locale: Locale = DEFAULT_LOCALE) {
+  return getLocalizedReportTypeLabel(value, locale);
 }
 
-export function getInputTypeLabel(value: string) {
-  const labels: Record<InputType, string> = {
-    text: "Text",
-    pdf: "PDF",
-    image: "Image",
-  };
-
-  return labels[value as InputType] ?? "Input";
+export function getInputTypeLabel(value: string, locale: Locale = DEFAULT_LOCALE) {
+  return getLocalizedInputTypeLabel(value as InputType, locale);
 }
 
 export function getDirection(language?: string) {
-  return language === "Arabic" ? "rtl" : "ltr";
+  return getLocaleDirection(localeFromLanguage(language));
 }
 
-export function formatDate(value: string | Date) {
-  return new Intl.DateTimeFormat("en", {
+export function formatDate(value: string | Date, locale: Locale = DEFAULT_LOCALE) {
+  const dateLocale = locale === "ar" ? "ar-SA" : locale;
+  return new Intl.DateTimeFormat(dateLocale, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -77,10 +79,15 @@ export function statusBadgeClass(status: ValueStatus) {
   return classes[status] ?? classes.Unknown;
 }
 
-export function deriveTitle(reportType: string, analysis?: AnalysisResult) {
+export function deriveTitle(
+  reportType: string,
+  analysis?: AnalysisResult,
+  locale: Locale = DEFAULT_LOCALE,
+) {
   const detected = analysis?.detected_report_type?.trim();
-  const type = detected || getReportTypeLabel(reportType);
-  const date = new Intl.DateTimeFormat("en", {
+  const type = detected || getReportTypeLabel(reportType, locale);
+  const dateLocale = locale === "ar" ? "ar-SA" : locale;
+  const date = new Intl.DateTimeFormat(dateLocale, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -89,12 +96,13 @@ export function deriveTitle(reportType: string, analysis?: AnalysisResult) {
   return `${type} - ${date}`;
 }
 
-export function parseAnalysis(value: string): AnalysisResult {
+export function parseAnalysis(value: string, language?: string): AnalysisResult {
   const parsed = JSON.parse(value) as Partial<AnalysisResult>;
+  const locale = localeFromLanguage(language);
 
   return {
     detected_report_type: parsed.detected_report_type,
-    simple_summary: parsed.simple_summary ?? "No summary was returned for this report.",
+    simple_summary: parsed.simple_summary ?? t(locale, "analysis.noSummary"),
     key_findings: Array.isArray(parsed.key_findings) ? parsed.key_findings : [],
     values_table: Array.isArray(parsed.values_table) ? parsed.values_table : [],
     medical_terms: Array.isArray(parsed.medical_terms) ? parsed.medical_terms : [],
@@ -102,28 +110,41 @@ export function parseAnalysis(value: string): AnalysisResult {
       ? parsed.doctor_questions
       : [],
     safety_notes: Array.isArray(parsed.safety_notes)
-      ? ensureBaselineSafetyNotes(parsed.safety_notes)
-      : BASELINE_SAFETY_NOTES,
+      ? ensureBaselineSafetyNotes(parsed.safety_notes, locale)
+      : getBaselineSafetyNotes(locale),
     urgent_warning: parsed.urgent_warning ?? {
       has_red_flags: false,
-      message: GENERIC_URGENT_WARNING,
+      message: getUrgentWarning(locale),
     },
   };
 }
 
-export function ensureBaselineSafetyNotes(notes: string[]) {
+export function ensureBaselineSafetyNotes(
+  notes: string[],
+  locale: Locale = DEFAULT_LOCALE,
+) {
   const normalized = notes.map((note) => note.toLowerCase());
-  const hasDiagnosis = normalized.some((note) => note.includes("diagnosis"));
+  const hasDiagnosis = normalized.some(
+    (note) =>
+      note.includes("diagnosis") ||
+      note.includes("tanı") ||
+      note.includes("تشخيص"),
+  );
   const hasProfessional = normalized.some(
     (note) =>
       note.includes("licensed") ||
       note.includes("doctor") ||
-      note.includes("healthcare professional"),
+      note.includes("healthcare professional") ||
+      note.includes("doktor") ||
+      note.includes("sağlık") ||
+      note.includes("طبيب") ||
+      note.includes("صحي"),
   );
+  const baseline = getBaselineSafetyNotes(locale);
 
   return [
     ...notes,
-    ...(hasDiagnosis ? [] : [BASELINE_SAFETY_NOTES[0]]),
-    ...(hasProfessional ? [] : [BASELINE_SAFETY_NOTES[1]]),
+    ...(hasDiagnosis ? [] : [baseline[0]]),
+    ...(hasProfessional ? [] : [baseline[1]]),
   ];
 }

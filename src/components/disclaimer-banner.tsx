@@ -1,4 +1,7 @@
+"use client";
+
 import { ShieldCheck } from "lucide-react";
+import { useLocale } from "@/components/locale-provider";
 import { cn } from "@/lib/utils";
 
 interface DisclaimerBannerProps {
@@ -7,6 +10,8 @@ interface DisclaimerBannerProps {
 }
 
 export function DisclaimerBanner({ className, compact = false }: DisclaimerBannerProps) {
+  const { t } = useLocale();
+
   return (
     <div
       className={cn(
@@ -19,22 +24,19 @@ export function DisclaimerBanner({ className, compact = false }: DisclaimerBanne
         <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl bg-[var(--color-info-notice-icon-bg)] text-[var(--color-accent-blue)]">
           <ShieldCheck className="size-4.5" />
         </span>
-        <p className="pt-0.5">
-          MedExplain AI explains reports in simple language. It is not a diagnosis
-          and does not replace a doctor. Always discuss your report with a licensed
-          healthcare professional.
-        </p>
+        <p className="pt-0.5">{t("disclaimer.full")}</p>
       </div>
     </div>
   );
 }
 
 export function DisclaimerFooter() {
+  const { t } = useLocale();
+
   return (
     <footer className="border-t border-border bg-background">
       <div className="content-container py-4 text-center text-xs leading-relaxed text-muted-foreground">
-        MedExplain AI explains reports in simple language. It is not a diagnosis
-        and does not replace a doctor.
+        {t("disclaimer.footer")}
       </div>
     </footer>
   );

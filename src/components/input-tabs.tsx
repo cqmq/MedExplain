@@ -4,6 +4,7 @@ import Image from "next/image";
 import type * as React from "react";
 import { FileText, ImageIcon, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLocale } from "@/components/locale-provider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { cn, formatFileSize } from "@/lib/utils";
@@ -31,37 +32,39 @@ export function InputTabs({
   onFilePick,
   onRemoveFile,
 }: InputTabsProps) {
+  const { t } = useLocale();
+
   return (
     <Tabs value={mode} onValueChange={(value) => onModeChange(value as InputMode)}>
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="text">
           <FileText className="size-4" />
-          <span className="hidden sm:inline">Paste text</span>
-          <span className="sm:hidden">Text</span>
+          <span className="hidden sm:inline">{t("input.text.long")}</span>
+          <span className="sm:hidden">{t("input.text.short")}</span>
         </TabsTrigger>
         <TabsTrigger value="pdf">
           <Upload className="size-4" />
-          PDF
+          {t("input.pdf")}
         </TabsTrigger>
         <TabsTrigger value="image">
           <ImageIcon className="size-4" />
-          Image
+          {t("input.image")}
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value="text">
         <label htmlFor="report-text" className="sr-only">
-          Paste report text
+          {t("input.text.label")}
         </label>
         <Textarea
           id="report-text"
           value={text}
           onChange={(event) => onTextChange(event.target.value)}
           className="min-h-72 resize-y"
-          placeholder="Paste your medical report here. Example: Complete Blood Count, Hemoglobin: 14.2 g/dL (Ref: 13.0-17.0)..."
+          placeholder={t("input.text.placeholder")}
         />
-        <div className="mt-2 text-right text-xs text-muted-foreground">
-          {text.trim().length} characters
+        <div className="mt-2 text-end text-xs text-muted-foreground">
+          {text.trim().length} {t("input.characters")}
         </div>
       </TabsContent>
 
@@ -69,8 +72,8 @@ export function InputTabs({
         <FileDropzone
           accept="application/pdf"
           file={file}
-          title="Upload a PDF report"
-          description="Drag and drop a PDF here, or browse your files. Maximum 25 MB."
+          title={t("input.pdf.title")}
+          description={t("input.pdf.description")}
           onFilePick={onFilePick}
           onRemoveFile={onRemoveFile}
         />
@@ -81,8 +84,8 @@ export function InputTabs({
           accept="image/jpeg,image/png,image/webp"
           file={file}
           imagePreview={imagePreview}
-          title="Upload a report photo"
-          description="Use JPG, PNG, or WebP. Maximum 5 MB."
+          title={t("input.image.title")}
+          description={t("input.image.description")}
           onFilePick={onFilePick}
           onRemoveFile={onRemoveFile}
         />
@@ -110,6 +113,7 @@ function FileDropzone({
   onFilePick,
   onRemoveFile,
 }: FileDropzoneProps) {
+  const { t } = useLocale();
   const inputId = `file-${accept.replace(/[^a-z]/gi, "-")}`;
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -132,7 +136,7 @@ function FileDropzone({
         onDrop={handleDrop}
         className={cn(
           "flex min-h-72 cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border bg-secondary/70 p-8 text-center transition-colors hover:bg-secondary",
-          file && "border-[var(--color-accent-teal)] bg-[var(--color-accent-teal-soft)]/60",
+          file && "border-[var(--color-accent-teal)] bg-[var(--color-bg-tertiary)]",
         )}
       >
         <input
@@ -152,7 +156,7 @@ function FileDropzone({
           </p>
         </div>
         <Button type="button" variant="secondary" size="sm">
-          Browse files
+          {t("input.browse")}
         </Button>
       </label>
 
@@ -162,7 +166,7 @@ function FileDropzone({
             {imagePreview ? (
               <Image
                 src={imagePreview}
-                alt="Selected report preview"
+                alt={t("input.previewAlt")}
                 width={64}
                 height={64}
                 className="size-16 rounded-xl object-cover"
@@ -182,7 +186,7 @@ function FileDropzone({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label="Remove selected file"
+            aria-label={t("input.remove")}
             onClick={onRemoveFile}
           >
             <X className="size-4" />

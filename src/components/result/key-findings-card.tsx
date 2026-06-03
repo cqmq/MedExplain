@@ -2,12 +2,14 @@ import { CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { SectionHeading } from "@/components/result/section-heading";
 import type { KeyFinding } from "@/lib/types";
+import { t, type Locale } from "@/lib/i18n";
 
 interface KeyFindingsCardProps {
   findings: KeyFinding[];
+  locale: Locale;
 }
 
-export function KeyFindingsCard({ findings }: KeyFindingsCardProps) {
+export function KeyFindingsCard({ findings, locale }: KeyFindingsCardProps) {
   if (findings.length === 0) return null;
 
   return (
@@ -15,8 +17,8 @@ export function KeyFindingsCard({ findings }: KeyFindingsCardProps) {
       <CardHeader>
         <SectionHeading
           icon={CheckCircle2}
-          title="Key findings"
-          description="Plain-language points based only on the report content."
+          title={t(locale, "report.findings.title")}
+          description={t(locale, "report.findings.description")}
         />
       </CardHeader>
       <CardContent>
