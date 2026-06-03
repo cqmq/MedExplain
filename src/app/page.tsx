@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   BookOpen,
@@ -15,57 +17,59 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DisclaimerBanner } from "@/components/disclaimer-banner";
+import { useLocale } from "@/components/locale-provider";
+import { getStatusLabel } from "@/lib/i18n";
 
 const steps = [
   {
     icon: Upload,
-    title: "Upload or paste",
-    description: "Use text, a PDF, or a photo of your report.",
+    title: "home.step.upload.title",
+    description: "home.step.upload.description",
   },
   {
     icon: Sparkles,
-    title: "AI explains it simply",
-    description: "Get structured, patient-friendly explanations.",
+    title: "home.step.ai.title",
+    description: "home.step.ai.description",
   },
   {
     icon: Download,
-    title: "Save or download",
-    description: "Review history or print a clean PDF summary.",
+    title: "home.step.save.title",
+    description: "home.step.save.description",
   },
-];
+] as const;
 
 const features = [
-  { icon: FileText, title: "Simple summary" },
-  { icon: ListChecks, title: "Normal and abnormal values" },
-  { icon: BookOpen, title: "Medical terms dictionary" },
-  { icon: MessageCircleQuestion, title: "Doctor questions" },
-  { icon: Download, title: "PDF export" },
-  { icon: History, title: "Report history" },
-];
+  { icon: FileText, title: "home.feature.summary" },
+  { icon: ListChecks, title: "home.feature.values" },
+  { icon: BookOpen, title: "home.feature.terms" },
+  { icon: MessageCircleQuestion, title: "home.feature.questions" },
+  { icon: Download, title: "home.feature.pdf" },
+  { icon: History, title: "home.feature.history" },
+] as const;
 
 export default function Home() {
+  const { locale, t } = useLocale();
+
   return (
     <div>
       <section className="content-container grid gap-10 py-16 lg:grid-cols-[1fr_0.85fr] lg:items-center lg:py-24">
         <div>
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-[var(--color-accent-teal-soft)] px-3 py-1 text-sm font-medium text-[var(--color-accent-teal)]">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)] px-3 py-1 text-sm font-medium text-[var(--color-accent-teal)]">
             <ShieldCheck className="size-4" />
-            For understanding reports, not diagnosis
+            {t("home.badge")}
           </div>
           <h1 className="max-w-4xl text-4xl font-bold leading-tight tracking-normal sm:text-5xl">
-            Understand your medical reports in simple language.
+            {t("home.title")}
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-            Paste, upload a PDF, or upload a photo of your report and get a
-            clear explanation, key findings, doctor questions, and a
-            downloadable summary.
+            {t("home.description")}
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg">
-              <Link href="/analyze">Analyze a Report</Link>
+              <Link href="/analyze">{t("home.analyze")}</Link>
             </Button>
             <Button asChild size="lg" variant="secondary">
-              <Link href="/analyze?demo=1">Try a Demo Report</Link>
+              <Link href="/analyze?demo=1">{t("home.demo")}</Link>
             </Button>
           </div>
         </div>
@@ -83,29 +87,31 @@ export default function Home() {
               <div className="rounded-2xl bg-secondary p-4">
                 <div className="mb-3 flex items-center gap-3">
                   <FileImage className="size-5 text-[var(--color-accent-teal)]" />
-                  <span className="font-semibold">Blood test summary</span>
+                  <span className="font-semibold">{t("home.preview.title")}</span>
                 </div>
                 <p className="text-sm leading-7 text-muted-foreground">
-                  Your report mostly shows values within the listed ranges. A few
-                  values appear outside or near the edge of the report&apos;s ranges
-                  and are good topics to discuss with your doctor.
+                  {t("home.preview.text")}
                 </p>
               </div>
               <div className="grid gap-3 sm:grid-cols-3">
                 {["Normal", "Needs review", "Low"].map((status) => (
                   <div key={status} className="rounded-2xl border border-border p-4">
-                    <p className="text-xs text-muted-foreground">Status</p>
-                    <p className="mt-1 font-semibold">{status}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t("home.preview.status")}
+                    </p>
+                    <p className="mt-1 font-semibold">
+                      {getStatusLabel(status, locale)}
+                    </p>
                   </div>
                 ))}
               </div>
               <div className="rounded-2xl border border-border p-4">
                 <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
                   <HelpCircle className="size-4 text-[var(--color-accent-blue)]" />
-                  Ask your doctor
+                  {t("home.preview.ask")}
                 </div>
                 <p className="text-sm leading-7 text-muted-foreground">
-                  Should I repeat any of these tests, and when?
+                  {t("home.preview.question")}
                 </p>
               </div>
             </div>
@@ -115,9 +121,9 @@ export default function Home() {
 
       <section className="content-container py-10">
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold tracking-normal">How it works</h2>
+          <h2 className="text-2xl font-semibold tracking-normal">{t("home.how.title")}</h2>
           <p className="mt-2 text-muted-foreground">
-            A guided workflow for reports, scans, notes, and prescriptions.
+            {t("home.how.description")}
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
@@ -127,9 +133,9 @@ export default function Home() {
                 <span className="medical-icon-surface mb-5 flex size-12 items-center justify-center rounded-2xl text-white">
                   <step.icon className="size-5" />
                 </span>
-                <h3 className="font-semibold">{step.title}</h3>
+                <h3 className="font-semibold">{t(step.title)}</h3>
                 <p className="mt-2 text-sm leading-7 text-muted-foreground">
-                  {step.description}
+                  {t(step.description)}
                 </p>
               </CardContent>
             </Card>
@@ -139,9 +145,9 @@ export default function Home() {
 
       <section className="content-container py-10">
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold tracking-normal">Features</h2>
+          <h2 className="text-2xl font-semibold tracking-normal">{t("home.features.title")}</h2>
           <p className="mt-2 text-muted-foreground">
-            Works with text, PDFs, and images.
+            {t("home.features.description")}
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -151,7 +157,7 @@ export default function Home() {
                 <span className="flex size-11 items-center justify-center rounded-xl bg-secondary text-[var(--color-accent-teal)]">
                   <feature.icon className="size-5" />
                 </span>
-                <span className="font-medium">{feature.title}</span>
+                <span className="font-medium">{t(feature.title)}</span>
               </CardContent>
             </Card>
           ))}
@@ -164,14 +170,14 @@ export default function Home() {
 
       <section className="content-container py-14 text-center">
         <h2 className="text-3xl font-bold tracking-normal">
-          Ready to simplify a report?
+          {t("home.cta.title")}
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-          Start with pasted text, a PDF, a photo, or the built-in demo report.
+          {t("home.cta.description")}
         </p>
         <div className="mt-7">
           <Button asChild size="lg">
-            <Link href="/analyze">Analyze a Report</Link>
+            <Link href="/analyze">{t("home.analyze")}</Link>
           </Button>
         </div>
       </section>

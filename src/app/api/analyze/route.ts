@@ -4,6 +4,7 @@ import type { ResponseInputContent } from "openai/resources/responses/responses"
 import { ANALYSIS_SCHEMA, SYSTEM_PROMPT } from "@/lib/ai";
 import { prisma } from "@/lib/prisma";
 import type { AnalysisResult } from "@/lib/types";
+import { localeFromLanguage } from "@/lib/i18n";
 import { deriveTitle, ensureBaselineSafetyNotes } from "@/lib/utils";
 
 export const runtime = "nodejs";
@@ -32,6 +33,7 @@ export async function POST(req: NextRequest) {
     const form = await req.formData();
     const reportType = (form.get("reportType") as string) || "general";
     const language = (form.get("language") as string) || "English";
+    const locale = localeFromLanguage(language);
     const consent = form.get("consent") as string;
     const text = form.get("text") as string | null;
     const file = form.get("file") as File | null;
@@ -142,12 +144,13 @@ export async function POST(req: NextRequest) {
       ...parsed,
       safety_notes: ensureBaselineSafetyNotes(
         parsed.safety_notes ?? [],
+        locale,
       ),
     };
 
     const report = await prisma.report.create({
       data: {
-        title: deriveTitle(reportType, analysis),
+        title: deriveTitle(reportType, analysis, locale),
         reportType,
         inputType,
         originalText,

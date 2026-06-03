@@ -5,20 +5,22 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { SectionHeading } from "@/components/result/section-heading";
+import { t, type Locale } from "@/lib/i18n";
 
 interface DoctorQuestionsCardProps {
   questions: string[];
+  locale: Locale;
 }
 
-export function DoctorQuestionsCard({ questions }: DoctorQuestionsCardProps) {
+export function DoctorQuestionsCard({ questions, locale }: DoctorQuestionsCardProps) {
   if (questions.length === 0) return null;
 
   async function copyQuestions() {
     try {
       await navigator.clipboard.writeText(questions.map((q) => `- ${q}`).join("\n"));
-      toast.success("Questions copied.");
+      toast.success(t(locale, "report.questions.copied"));
     } catch {
-      toast.error("Could not copy the questions.");
+      toast.error(t(locale, "report.questions.error"));
     }
   }
 
@@ -27,7 +29,7 @@ export function DoctorQuestionsCard({ questions }: DoctorQuestionsCardProps) {
       <CardHeader className="flex-row items-start justify-between gap-4">
         <SectionHeading
           icon={MessageCircleQuestion}
-          title="Questions to ask your doctor"
+          title={t(locale, "report.questions.title")}
         />
         <Button
           type="button"
@@ -37,7 +39,7 @@ export function DoctorQuestionsCard({ questions }: DoctorQuestionsCardProps) {
           onClick={copyQuestions}
         >
           <Clipboard className="size-4" />
-          Copy all
+          {t(locale, "report.questions.copy")}
         </Button>
       </CardHeader>
       <CardContent>

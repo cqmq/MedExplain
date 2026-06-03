@@ -7,7 +7,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useLocale } from "@/components/locale-provider";
 import { REPORT_TYPES } from "@/lib/utils";
+import { getReportTypeLabel } from "@/lib/i18n";
 
 interface ReportTypeSelectProps {
   value: string;
@@ -15,15 +17,17 @@ interface ReportTypeSelectProps {
 }
 
 export function ReportTypeSelect({ value, onValueChange }: ReportTypeSelectProps) {
+  const { locale, t } = useLocale();
+
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger id="report-type" aria-label="Report type">
-        <SelectValue placeholder="Choose report type" />
+      <SelectTrigger id="report-type" aria-label={t("analyze.reportType")}>
+        <SelectValue />
       </SelectTrigger>
       <SelectContent>
         {REPORT_TYPES.map((type) => (
           <SelectItem key={type.value} value={type.value}>
-            {type.label}
+            {getReportTypeLabel(type.value, locale)}
           </SelectItem>
         ))}
       </SelectContent>

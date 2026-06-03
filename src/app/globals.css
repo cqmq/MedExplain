@@ -32,6 +32,10 @@
   --color-info-notice-border: #b8ddea;
   --color-info-notice-icon-bg: #dff3fb;
   --color-info-notice-text: #31515e;
+  --color-warning-notice-bg: #fff8eb;
+  --color-warning-notice-border: #f3d195;
+  --color-warning-notice-icon-bg: #fef0c7;
+  --color-warning-notice-text: #694313;
   --color-accent-green: #047857;
   --color-accent-amber: #b45309;
   --color-accent-red: #be123c;
@@ -52,8 +56,8 @@
   --color-status-unknown-text: #475569;
   --color-status-unknown-border: #e2e8f0;
 
-  --font-app-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI",
-    "Helvetica Neue", Arial, sans-serif;
+  --font-app-sans: var(--font-inter), var(--font-noto-sans-arabic), -apple-system,
+    BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-app-mono: var(--font-jetbrains-mono), "SF Mono", Menlo, Monaco, Consolas,
     monospace;
 
@@ -119,6 +123,10 @@
     --color-info-notice-border: #275461;
     --color-info-notice-icon-bg: #173642;
     --color-info-notice-text: #c3d5da;
+    --color-warning-notice-bg: #2a2112;
+    --color-warning-notice-border: #6b4b18;
+    --color-warning-notice-icon-bg: #3a2a0e;
+    --color-warning-notice-text: #f4d8a7;
 
     --color-status-normal-bg: #0f2f23;
     --color-status-normal-text: #86efac;
@@ -190,6 +198,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+html[dir="rtl"] body {
+  font-family: var(--font-noto-sans-arabic), var(--font-inter), -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
 }
 
 ::selection {

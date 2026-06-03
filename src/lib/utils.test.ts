@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   deriveTitle,
   ensureBaselineSafetyNotes,
+  formatDate,
   formatFileSize,
   getDirection,
   parseAnalysis,
   statusBadgeClass,
 } from "@/lib/utils";
+import { getBaselineSafetyNotes, getInputTypeLabel, getReportTypeLabel } from "@/lib/i18n";
 
 describe("utils", () => {
   it("maps status values to semantic token classes", () => {
@@ -53,11 +55,20 @@ describe("utils", () => {
     expect(notes).toHaveLength(2);
   });
 
+  it("returns localized safety notes and labels", () => {
+    expect(getBaselineSafetyNotes("tr")[0]).toContain("tanı");
+    expect(getBaselineSafetyNotes("ar")[0]).toContain("تشخيص");
+    expect(getReportTypeLabel("blood_test", "tr")).toBe("Kan testi");
+    expect(getInputTypeLabel("image", "ar")).toBe("صورة");
+  });
+
   it("formats file sizes and RTL language direction", () => {
     expect(formatFileSize(512)).toBe("512 B");
     expect(formatFileSize(2048)).toBe("2.0 KB");
     expect(formatFileSize(2 * 1024 * 1024)).toBe("2.0 MB");
     expect(getDirection("Arabic")).toBe("rtl");
+    expect(getDirection("Arabic - Saudi dialect")).toBe("rtl");
     expect(getDirection("Turkish")).toBe("ltr");
+    expect(formatDate(new Date("2026-06-02T12:00:00Z"), "tr")).toContain("2026");
   });
 });
