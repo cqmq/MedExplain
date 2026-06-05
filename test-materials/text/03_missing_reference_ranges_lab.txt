@@ -1,0 +1,28 @@
+Metro Diagnostic Services
+Synthetic Lab Extract - Reference ranges not printed on this copy
+
+Patient: Casey Demo
+Patient ID: SYN-1003
+Collection date: 2026-03-11
+Specimen: Blood
+
+Important lab-system note:
+This exported copy does not show reference ranges. The original lab portal may
+show ranges separately by age, sex, pregnancy status, or laboratory method.
+
+Results:
+- TSH: 6.2 mIU/L
+- Free T4: 0.8 ng/dL
+- Ferritin: 18 ng/mL
+- Vitamin B12: 245 pg/mL
+- Hemoglobin A1c: 5.8%
+- C-reactive protein (CRP): 9.5 mg/L
+- ESR: 24 mm/hr
+
+Provider comment:
+"Please review values with the ordering clinician. Reference intervals are not
+included in this exported test copy."
+
+Testing purpose:
+The analysis should not invent reference ranges. Value statuses should be
+Unknown or carefully worded because ranges are not provided in the report.
